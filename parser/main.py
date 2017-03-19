@@ -7,29 +7,36 @@ from BeautifulSoup import BeautifulSoup
 def printToFile(fname, arr):
     print >> open(fname, 'w'), len(arr), u' '.join(arr)
 
-def check(cur_id, problems):
+def getName(soup, cur_id):
 	web_page = urllib2.urlopen("http://acmp.ru/index.asp?main=user&id=" + cur_id).read()
 	soup = BeautifulSoup(web_page)
+	return soup.html.body.table.tr.nextSibling.nextSibling.nextSibling.nextSibling.td.table.tr.td.nextSibling.nextSibling.table.tr.td.nextSibling.nextSibling.nextSibling.nextSibling.next
 
-	name = soup.html.body.table.tr.nextSibling.nextSibling.nextSibling.nextSibling.td.table.tr.td.nextSibling.nextSibling.table.tr.td.nextSibling.nextSibling.nextSibling.nextSibling.next
-
-	# print name
-
-	solved = 0
+def getSolved(soup, cur_id):
 	for e in soup.html.body.table.findAll('b'):
 	    if (e.next.startswith(u'Решенные задачи')):
-	        solved = [r.next for r in e.nextSibling.nextSibling.findAll('a')]
+	        return [r.next for r in e.nextSibling.nextSibling.findAll('a')]
+	return []
 
-	result = ""
+def check(soup, cur_id, problems):
+    solved = getSolved(soup, cur_id)
+    return ["+" if solved.count(p) > 0 else "-" for p in problems]
 
-	for p in problems:
-		if solved.count(p) > 0:
-			result = result + ("+")
-		else:
-			result = result + ("-")
+def readList(fname):
+	i = open(fname, "r")
+	return [x for x in i.read().split('\n')]
 
-	return result
+problems = readList("problems.txt")
+ids = readList("ids.txt")
 
-	# printToFile(cur_id, solved)
+problems.pop()
+ids.pop()
 
-print check("93028", ["15", "56", "697"])
+print problems
+
+for cur_id in ids:
+    web_page = urllib2.urlopen("http://acmp.ru/index.asp?main=user&id=" + cur_id).read()
+    soup = BeautifulSoup(web_page)
+    print getName(soup, cur_id), " ", check(soup, cur_id, problems)
+
+# print check("93028", ["15", "56", "697"])
