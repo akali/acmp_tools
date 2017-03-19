@@ -8,8 +8,8 @@ def printToFile(fname, arr):
     print >> open(fname, 'w'), len(arr), u' '.join(arr)
 
 def getName(soup, cur_id):
-	web_page = urllib2.urlopen("http://acmp.ru/index.asp?main=user&id=" + cur_id).read()
-	soup = BeautifulSoup(web_page)
+	# web_page = urllib2.urlopen("http://acmp.ru/index.asp?main=user&id=" + cur_id).read()
+	# soup = BeautifulSoup(web_page)
 	return soup.html.body.table.tr.nextSibling.nextSibling.nextSibling.nextSibling.td.table.tr.td.nextSibling.nextSibling.table.tr.td.nextSibling.nextSibling.nextSibling.nextSibling.next
 
 def getSolved(soup, cur_id):
@@ -32,11 +32,18 @@ ids = readList("ids.txt")
 problems.pop()
 ids.pop()
 
-print problems
+print "<meta charset=\"utf-8\">"
+
+for p in problems:
+    print "<a href=\"http://acmp.ru/index.asp?main=task&id_task= + p\">" + p + "</a>"
+
+print "<br>"
+
+# print problems
 
 for cur_id in ids:
     web_page = urllib2.urlopen("http://acmp.ru/index.asp?main=user&id=" + cur_id).read()
     soup = BeautifulSoup(web_page)
-    print getName(soup, cur_id), " ", check(soup, cur_id, problems)
+    print " <br> ", getName(soup, cur_id), " ", check(soup, cur_id, problems)
 
 # print check("93028", ["15", "56", "697"])
